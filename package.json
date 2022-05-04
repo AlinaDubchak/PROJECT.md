@@ -1,0 +1,28 @@
+{
+  "name": "project.md",
+  "version": "1.0.0",
+  "description": "tetris game",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run -s lint && node test/all.js",
+    "lint": "eslint . --fix && prettier --write \"**/*.js\" \"**/*.json\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlinaDubchak/PROJECT.md.git"
+  },
+  "keywords": [],
+  "author": "AlinaDubchak and mmarty12",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlinaDubchak/PROJECT.md/issues"
+  },
+  "homepage": "https://github.com/AlinaDubchak/PROJECT.md#readme",
+  "dependencies": {
+    "eslint": "^8.14.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.6.2"
+  }
+}
