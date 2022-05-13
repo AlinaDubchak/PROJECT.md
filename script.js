@@ -5,40 +5,9 @@ const main = document.querySelector('.main');
 const movingCells = 1;
 const fixedCells = 2;
 const freeCells = 0;
-const speedFigure = 1000;
 
-const field = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-];
-
-const activePiece = {
-  x: 0,
-  y: 0,
-  blocks: [
-    [0, 1, 0],
-    [1, 1, 1],
-    [0, 0, 0],
-  ],
-};
+const rows = Array(10).fill(0);
+const field = Array(20).fill(rows);
 
 
 function draw() {
@@ -56,50 +25,31 @@ function draw() {
   main.innerHTML = fieldHTML;
 }
 
-function removePrevPiece() {
+function canMoveDown() {
   for (let y = 0; y < field.length; y++) {
     for (let x = 0; x < field[y].length; x++) {
       if (field[y][x] === movingCells) {
-        field[y][x] = freeCells;
+        if (y === field.length - 1 || field[y + 1][x] === fixedCells) {
+          return false;
+        }
       }
     }
   }
+  return true;
 }
 
-
-let { x: pieceY, x: pieceX } = activePiece;
-const { blocks } = activePiece;
-
-
-function addActivePiece() {
-  removePrevPiece();
-  for (let y = 0; y < blocks.length; y++) {
-    for (let x = 0; x < blocks[y].length; x++) {
-      if (blocks[y][x] === movingCells) {
-        field[pieceY + y][pieceX + x] = blocks[y][x];
+function moveDown() {
+  if (canMoveDown()) {
+    for (let y = field.length - 1; y >= 0; y--) {
+      for (let x = 0; x < field[y].length; x++) {
+        if (field[y][x] === movingCells) {
+          field[y + 1][x] = movingCells;
+          field[y][x] = freeCells;
+        }
       }
     }
-  }
+  } else fixFigure();
 }
-
-
-function hasCollisions() {
-  for (let y = 0; y < blocks.length; y++) {
-    for (let x = 0; x < blocks[y].length; x++) {
-      if (
-        blocks[y][x] &&
-        (field[pieceY + y] === undefined ||
-          field[pieceY + y][pieceX + x] === undefined ||
-          field[pieceY + y][pieceX + x] === fixedCells)
-      ) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-
 
 function fixFigure() {
   for (let y = field.length - 1; y >= 0; y--) {
@@ -111,45 +61,11 @@ function fixFigure() {
   }
 }
 
-function moveDown() {
-  pieceY += 1;
-  if (hasCollisions()) {
-    pieceY -= 1;
-    fixFigure();
-    pieceY = 0;
-  }
-}
-
-document.addEventListener(
-  'keydown',
-  e => {
-    switch (e.code) {
-    case 'ArrowLeft':
-      pieceX -= 1;
-      if (hasCollisions()) {
-        pieceX += 1;
-      }
-      break;
-    case 'ArrowRight':
-      pieceX += 1;
-      if (hasCollisions()) {
-        pieceX -= 1;
-      }
-      break;
-    case 'ArrowDown':
-      moveDown();
-      break;
-    }
-
-    addActivePiece();
-    draw();
-  },
-  true
-);
+const speedFigure = 1000;
+draw();
 
 function startGame() {
   moveDown();
-  addActivePiece();
   draw();
   setTimeout(startGame, speedFigure);
 }
