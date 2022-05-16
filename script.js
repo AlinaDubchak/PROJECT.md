@@ -30,71 +30,68 @@ const field = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ];
 
-let activePiece = createPieces();
-let nextPiece = createPieces();
+const activePiece = {
+  x: 0,
+  y: 0,
+  blocks: [
+    [0, 1, 0],
+    [1, 1, 1],
+    [0, 0, 0],
+  ],
+};
 
-function createPieces() {
-  const index = Math.floor(Math.random() * 7);
-  const type = 'IJLOTSZ'[index];
-  const piece = { x: 0, y: 0 };
-  switch (type) {
-  case 'I':
-      piece.blocks = [
+function createFigures() {
+  const figures = {
+    I:
+      [
         [0, 0, 0, 0],
         [1, 1, 1, 1],
         [0, 0, 0, 0],
         [0, 0, 0, 0],
-      ];
-      break;
-    case 'J':
-      piece.blocks = [
+      ],
+    J:
+      [
         [0, 0, 0],
         [1, 1, 1],
         [0, 0, 1],
-      ];
-      break;
-    case 'L':
-      piece.blocks = [
+      ],
+    L:
+      [
         [0, 0, 0],
         [1, 1, 1],
         [1, 0, 0],
-      ];
-      break;
-    case 'O':
-      piece.blocks = [
+      ],
+
+    O:
+      [
         [1, 1],
         [1, 1],
-      ];
-      break;
-    case 'T':
-      piece.blocks = [
+      ],
+    T:
+      [
         [0, 0, 0],
         [1, 1, 1],
         [0, 1, 0],
-      ];
-      break;
-    case 'S':
-      piece.blocks = [
+      ],
+    S:
+      [
         [0, 0, 0],
         [0, 1, 1],
         [1, 1, 0],
-      ];
-      break;
-    case 'Z':
-      piece.blocks = [
+      ],
+    Z:
+      [
         [0, 0, 0],
         [1, 1, 0],
         [0, 1, 1],
-      ];
-      break;
-    default:
-      throw new Error('undefined figure');
-  }
-  piece.x = Math.floor((10 - piece.blocks[0].length) / 2);
-  piece.y = 0;
+      ],
+  };
 
-  return piece;
+  const possibleFigures = 'IOLJSTZ';
+  const rand = Math.floor(Math.random() * 7);
+  return figures[possibleFigures[rand]];
 }
+
 
 function draw() {
   let fieldHTML = '';
@@ -122,7 +119,7 @@ function removePrevPiece() {
 }
 
 let { x: pieceY, x: pieceX } = activePiece;
-const { blocks } = activePiece;
+let { blocks } = activePiece;
 
 function addActivePiece() {
   removePrevPiece();
@@ -151,6 +148,8 @@ function hasCollisions() {
   return false;
 }
 
+
+
 function fixFigure() {
   for (let y = field.length - 1; y >= 0; y--) {
     for (let x = 0; x < field[y].length; x++) {
@@ -166,7 +165,8 @@ function moveDown() {
   if (hasCollisions()) {
     pieceY -= 1;
     fixFigure();
-    updatePiece();
+    blocks =  createFigures();
+    pieceX = Math.floor(10 - blocks[0].length) / 2;
     pieceY = 0;
   }
 }
@@ -175,21 +175,21 @@ document.addEventListener(
   'keydown',
   e => {
     switch (e.code) {
-      case 'ArrowLeft':
-        pieceX -= 1;
-        if (hasCollisions()) {
-          pieceX += 1;
-        }
-        break;
-      case 'ArrowRight':
+    case 'ArrowLeft':
+      pieceX -= 1;
+      if (hasCollisions()) {
         pieceX += 1;
-        if (hasCollisions()) {
-          pieceX -= 1;
-        }
-        break;
-      case 'ArrowDown':
-        moveDown();
-        break;
+      }
+      break;
+    case 'ArrowRight':
+      pieceX += 1;
+      if (hasCollisions()) {
+        pieceX -= 1;
+      }
+      break;
+    case 'ArrowDown':
+      moveDown();
+      break;
     }
 
     addActivePiece();
@@ -207,7 +207,3 @@ function startGame() {
 
 setTimeout(startGame, speedFigure);
 
-function updatePiece() {
-  activePiece = nextPiece;
-  nextPiece = createPieces();
-}
