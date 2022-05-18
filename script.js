@@ -148,7 +148,24 @@ function hasCollisions() {
   return false;
 }
 
-
+function eraseLines() {
+  for (let y = field.length - 1; y >= 0; y--) {
+    let numberOfBlocks = 0;
+    for (let x = 0; x < field[y].length; x++) {
+      if (field[y][x] !== 0) {
+        numberOfBlocks += 1;
+      }
+    }
+    if (numberOfBlocks === 0) {
+      break;
+    } else if (numberOfBlocks < field[y].length) {
+      continue;
+    } else if (numberOfBlocks === field[y].length) {
+      field.splice(y, 1);
+      field.splice(0, 0, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    }
+  }
+}
 
 function fixFigure() {
   for (let y = field.length - 1; y >= 0; y--) {
@@ -165,6 +182,7 @@ function moveDown() {
   if (hasCollisions()) {
     pieceY -= 1;
     fixFigure();
+    eraseLines();
     blocks =  createFigures();
     pieceX = Math.floor(10 - blocks[0].length) / 2;
     pieceY = 0;
