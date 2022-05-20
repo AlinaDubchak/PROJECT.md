@@ -9,52 +9,43 @@ const speedFigure = 1000;
 const rows = 20;
 const colums = 10;
 
-
-
 const figures = {
-  I:
-      [
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-      ],
-  J:
-      [
-        [1, 1, 1],
-        [0, 0, 1],
-        [0, 0, 0],
-      ],
-  L:
-      [
-        [1, 1, 1],
-        [1, 0, 0],
-        [0, 0, 0],
-      ],
+  I: [
+    [0, 1, 0, 0],
+    [0, 1, 0, 0],
+    [0, 1, 0, 0],
+    [0, 1, 0, 0],
+  ],
+  J: [
+    [1, 1, 1],
+    [0, 0, 1],
+    [0, 0, 0],
+  ],
+  L: [
+    [1, 1, 1],
+    [1, 0, 0],
+    [0, 0, 0],
+  ],
 
-  O:
-      [
-        [1, 1],
-        [1, 1],
-      ],
-  T:
-      [
-        [1, 1, 1],
-        [0, 1, 0],
-        [0, 0, 0],
-      ],
-  S:
-      [
-        [0, 1, 1],
-        [1, 1, 0],
-        [0, 0, 0],
-      ],
-  Z:
-      [
-        [1, 1, 0],
-        [0, 1, 1],
-        [0, 0, 0],
-      ],
+  O: [
+    [1, 1],
+    [1, 1],
+  ],
+  T: [
+    [1, 1, 1],
+    [0, 1, 0],
+    [0, 0, 0],
+  ],
+  S: [
+    [0, 1, 1],
+    [1, 1, 0],
+    [0, 0, 0],
+  ],
+  Z: [
+    [1, 1, 0],
+    [0, 1, 1],
+    [0, 0, 0],
+  ],
 };
 
 const field = createField();
@@ -70,7 +61,6 @@ function createField() {
   }
   return field;
 }
-
 
 function getState() {
   const field = createField();
@@ -115,7 +105,6 @@ function removePrevPiece() {
   }
 }
 
-
 function addActivePiece() {
   removePrevPiece();
   for (let y = 0; y < activePiece.blocks.length; y++) {
@@ -130,7 +119,8 @@ function addActivePiece() {
 function spinPiece() {
   const prevPiecePosition = activePiece.blocks;
   activePiece.blocks = activePiece.blocks[0].map((val, index) =>
-    activePiece.blocks.map(row => row[index]).reverse());
+    activePiece.blocks.map(row => row[index]).reverse()
+  );
   if (hasCollisions()) {
     activePiece.blocks = prevPiecePosition;
   }
@@ -171,7 +161,6 @@ function eraseLines() {
   }
 }
 
-
 function getNewFigures() {
   const possibleFigures = 'IJLOTSZ';
   const rand = Math.floor(Math.random() * 7);
@@ -182,7 +171,6 @@ function getNewFigures() {
     blocks: newPiece,
   };
 }
-
 
 function fixFigure() {
   for (let y = field.length - 1; y >= 0; y--) {
