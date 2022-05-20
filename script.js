@@ -6,92 +6,89 @@ const movingCells = 1;
 const fixedCells = 2;
 const freeCells = 0;
 const speedFigure = 1000;
+const rows = 20;
+const colums = 10;
 
-const field = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-];
 
-const activePiece = {
-  x: 0,
-  y: 0,
-  blocks: [
-    [0, 1, 0],
-    [1, 1, 1],
-    [0, 0, 0],
-  ],
-};
 
-function createFigures() {
-  const figures = {
-    I:
+const figures = {
+  I:
       [
-        [0, 0, 0, 0],
-        [1, 1, 1, 1],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
       ],
-    J:
+  J:
       [
-        [0, 0, 0],
         [1, 1, 1],
         [0, 0, 1],
-      ],
-    L:
-      [
         [0, 0, 0],
+      ],
+  L:
+      [
         [1, 1, 1],
         [1, 0, 0],
+        [0, 0, 0],
       ],
 
-    O:
+  O:
       [
         [1, 1],
         [1, 1],
       ],
-    T:
+  T:
       [
-        [0, 0, 0],
         [1, 1, 1],
         [0, 1, 0],
-      ],
-    S:
-      [
         [0, 0, 0],
+      ],
+  S:
+      [
         [0, 1, 1],
         [1, 1, 0],
-      ],
-    Z:
-      [
         [0, 0, 0],
+      ],
+  Z:
+      [
         [1, 1, 0],
         [0, 1, 1],
+        [0, 0, 0],
       ],
-  };
+};
 
-  const possibleFigures = 'IOLJSTZ';
-  const rand = Math.floor(Math.random() * 7);
-  return figures[possibleFigures[rand]];
+const field = createField();
+let activePiece = getNewFigures();
+
+function createField() {
+  const field = [];
+  for (let y = 0; y < rows; y++) {
+    field[y] = [];
+    for (let x = 0; x < colums; x++) {
+      field[y][x] = 0;
+    }
+  }
+  return field;
 }
 
+
+function getState() {
+  const field = createField();
+  for (let y = 0; y < field.length; y++) {
+    field[y] = [];
+    for (let x = 0; x < field[y].length; x++) {
+      field[y][x];
+    }
+  }
+  for (let y = 0; y < activePiece.blocks.length; y++) {
+    for (let x = 0; x < activePiece.blocks[y].length; x++) {
+      if (activePiece.blocks[y][x]) {
+        field[activePiece.y + y][activePiece.x + x] = activePiece.blocks[y][x];
+      }
+    }
+  }
+  return field;
+}
 
 function draw() {
   let fieldHTML = '';
@@ -118,28 +115,35 @@ function removePrevPiece() {
   }
 }
 
-let { x: pieceY, x: pieceX } = activePiece;
-let { blocks } = activePiece;
 
 function addActivePiece() {
   removePrevPiece();
-  for (let y = 0; y < blocks.length; y++) {
-    for (let x = 0; x < blocks[y].length; x++) {
-      if (blocks[y][x] === movingCells) {
-        field[pieceY + y][pieceX + x] = blocks[y][x];
+  for (let y = 0; y < activePiece.blocks.length; y++) {
+    for (let x = 0; x < activePiece.blocks[y].length; x++) {
+      if (activePiece.blocks[y][x] === movingCells) {
+        field[activePiece.y + y][activePiece.x + x] = activePiece.blocks[y][x];
       }
     }
   }
 }
 
+function spinPiece() {
+  const prevPiecePosition = activePiece.blocks;
+  activePiece.blocks = activePiece.blocks[0].map((val, index) =>
+    activePiece.blocks.map(row => row[index]).reverse());
+  if (hasCollisions()) {
+    activePiece.blocks = prevPiecePosition;
+  }
+}
+
 function hasCollisions() {
-  for (let y = 0; y < blocks.length; y++) {
-    for (let x = 0; x < blocks[y].length; x++) {
+  for (let y = 0; y < activePiece.blocks.length; y++) {
+    for (let x = 0; x < activePiece.blocks[y].length; x++) {
       if (
-        blocks[y][x] &&
-        (field[pieceY + y] === undefined ||
-          field[pieceY + y][pieceX + x] === undefined ||
-          field[pieceY + y][pieceX + x] === fixedCells)
+        activePiece.blocks[y][x] &&
+        (field[activePiece.y + y] === undefined ||
+          field[activePiece.y + y][activePiece.x + x] === undefined ||
+          field[activePiece.y + y][activePiece.x + x] === fixedCells)
       ) {
         return true;
       }
@@ -148,6 +152,36 @@ function hasCollisions() {
   return false;
 }
 
+function eraseLines() {
+  for (let y = field.length - 1; y >= 0; y--) {
+    let numberOfBlocks = 0;
+    for (let x = 0; x < field[y].length; x++) {
+      if (field[y][x] !== 0) {
+        numberOfBlocks += 1;
+      }
+    }
+    if (numberOfBlocks === 0) {
+      break;
+    } else if (numberOfBlocks < field[y].length) {
+      continue;
+    } else if (numberOfBlocks === field[y].length) {
+      field.splice(y, 1);
+      field.splice(0, 0, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    }
+  }
+}
+
+
+function getNewFigures() {
+  const possibleFigures = 'IJLOTSZ';
+  const rand = Math.floor(Math.random() * 7);
+  const newPiece = figures[possibleFigures[rand]];
+  return {
+    x: Math.floor((10 - newPiece[0].length) / 2),
+    y: 0,
+    blocks: newPiece,
+  };
+}
 
 
 function fixFigure() {
@@ -161,13 +195,13 @@ function fixFigure() {
 }
 
 function moveDown() {
-  pieceY += 1;
+  activePiece.y += 1;
   if (hasCollisions()) {
-    pieceY -= 1;
+    activePiece.y -= 1;
     fixFigure();
-    blocks =  createFigures();
-    pieceX = Math.floor(10 - blocks[0].length) / 2;
-    pieceY = 0;
+    eraseLines();
+    activePiece = getNewFigures();
+    activePiece.y = 0;
   }
 }
 
@@ -176,22 +210,23 @@ document.addEventListener(
   e => {
     switch (e.code) {
     case 'ArrowLeft':
-      pieceX -= 1;
+      activePiece.x -= 1;
       if (hasCollisions()) {
-        pieceX += 1;
+        activePiece.x += 1;
       }
       break;
     case 'ArrowRight':
-      pieceX += 1;
+      activePiece.x += 1;
       if (hasCollisions()) {
-        pieceX -= 1;
+        activePiece.x -= 1;
       }
       break;
     case 'ArrowDown':
       moveDown();
       break;
+    case 'ArrowUp':
+      spinPiece();
     }
-
     addActivePiece();
     draw();
   },
@@ -199,6 +234,7 @@ document.addEventListener(
 );
 
 function startGame() {
+  getState();
   moveDown();
   addActivePiece();
   draw();
@@ -206,4 +242,3 @@ function startGame() {
 }
 
 setTimeout(startGame, speedFigure);
-
