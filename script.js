@@ -1,13 +1,41 @@
 'use strict';
 
 const main = document.querySelector('.main');
+const points = document.getElementById('score');
+const levels = document.getElementById('level');
 
-const movingCells = 1;
-const fixedCells = 2;
-const freeCells = 0;
-const speedFigure = 1000;
-const rows = 20;
-const colums = 10;
+const movingCells = 1,
+      fixedCells = 2,
+      freeCells = 0,
+      //speedFigure = 1000,
+      rows = 20,
+      colums = 10;
+let score = 0;
+//let lines = 0;
+let currentLevel = 1;
+
+const possibleLevels = {
+  1: {
+    speed: 1000,
+    nextLevelScore: 100,
+  },
+  2: {
+    speed: 750,
+    nextLevelScore: 250,
+  },
+  3: {
+    speed: 500,
+    nextLevelScore: 400,
+  },
+  4: {
+    speed: 250,
+    nextLevelScore: 500,
+  },
+  5: {
+    speed: 200,
+    nextLevelScore: 700,
+  }
+}
 
 const figures = {
   I: [
@@ -143,25 +171,42 @@ function hasCollisions() {
 }
 
 function eraseLines() {
-  for (let y = field.length - 1; y >= 0; y--) {
+  const lines = [];
+  let filledLines = 0;
+  for (let y = rows - 1; y >= 0; y--) {
     let numberOfBlocks = 0;
-    for (let x = 0; x < field[y].length; x++) {
-      if (field[y][x] !== 0) {
+    for (let x = 0; x < colums; x++) {
+      if (field[y][x]) {
         numberOfBlocks += 1;
       }
     }
     if (numberOfBlocks === 0) {
       break;
-    } else if (numberOfBlocks < field[y].length) {
+    } else if (numberOfBlocks < colums) {
       continue;
-    } else if (numberOfBlocks === field[y].length) {
-      field.splice(y, 1);
-      field.splice(0, 0, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    } else if (numberOfBlocks === colums) {
+      lines.unshift(y);
     }
+    }
+      for (const index of lines) {
+        field.splice(index, 1);
+        field.unshift(new Array(colums).fill(0));
+        filledLines += 1;
+      }
+
+  score += filledLines * filledLines * 10;
+  points.innerHTML = score;
+  
+  if (score >= possibleLevels[currentLevel].nextLevelScore) {
+    currentLevel++;
+    levels.innerHTML = currentLevel;
   }
 }
 
-function getNewFigures() {
+
+
+
+ function getNewFigures() {
   const possibleFigures = 'IJLOTSZ';
   const rand = Math.floor(Math.random() * 7);
   const newPiece = figures[possibleFigures[rand]];
@@ -188,6 +233,7 @@ function moveDown() {
     activePiece.y -= 1;
     fixFigure();
     eraseLines();
+    //updateScore(filledLines);
     activePiece = getNewFigures();
     activePiece.y = 0;
   }
@@ -221,12 +267,15 @@ document.addEventListener(
   true
 );
 
+points.innerHTML = score;
+levels.innerHTML = currentLevel;
+
 function startGame() {
   getState();
   moveDown();
   addActivePiece();
   draw();
-  setTimeout(startGame, speedFigure);
+  setTimeout(startGame, possibleLevels[currentLevel].speed);
 }
 
-setTimeout(startGame, speedFigure);
+setTimeout(startGame, possibleLevels[currentLevel].speed);
