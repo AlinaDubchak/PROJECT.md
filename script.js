@@ -3,16 +3,22 @@
 const main = document.querySelector('.main');
 const points = document.getElementById('score');
 const levels = document.getElementById('level');
+const gameOver = document.getElementById('game-over');
+const yourScore = document.getElementById('current-score');
+const textScore = document.getElementById('your-score');
+const start = document.getElementById('start');
+const startAgain = document.getElementById('start-again');
+const pause = document.getElementById('space');
 
 const movingCells = 1,
-      fixedCells = 2,
-      freeCells = 0,
-      //speedFigure = 1000,
-      rows = 20,
-      colums = 10;
+  fixedCells = 2,
+  freeCells = 0,
+  rows = 20,
+  colums = 10;
 let score = 0;
-//let lines = 0;
+let isPaused = true;
 let currentLevel = 1;
+let timerID;
 
 const possibleLevels = {
   1: {
@@ -34,8 +40,8 @@ const possibleLevels = {
   5: {
     speed: 200,
     nextLevelScore: 700,
-  }
-}
+  },
+};
 
 const figures = {
   I: [
@@ -76,7 +82,7 @@ const figures = {
   ],
 };
 
-const field = createField();
+let field = createField(); //1
 let activePiece = getNewFigures();
 
 function createField() {
@@ -91,7 +97,7 @@ function createField() {
 }
 
 function getState() {
-  const field = createField();
+  const field = createField(); //1
   for (let y = 0; y < field.length; y++) {
     field[y] = [];
     for (let x = 0; x < field[y].length; x++) {
@@ -147,7 +153,7 @@ function addActivePiece() {
 function spinPiece() {
   const prevPiecePosition = activePiece.blocks;
   activePiece.blocks = activePiece.blocks[0].map((val, index) =>
-    activePiece.blocks.map(row => row[index]).reverse()
+    activePiece.blocks.map((row) => row[index]).reverse()
   );
   if (hasCollisions()) {
     activePiece.blocks = prevPiecePosition;
@@ -187,26 +193,23 @@ function eraseLines() {
     } else if (numberOfBlocks === colums) {
       lines.unshift(y);
     }
-    }
-      for (const index of lines) {
-        field.splice(index, 1);
-        field.unshift(new Array(colums).fill(0));
-        filledLines += 1;
-      }
+  }
+  for (const index of lines) {
+    field.splice(index, 1);
+    field.unshift(new Array(colums).fill(0));
+    filledLines += 1;
+  }
 
   score += filledLines * filledLines * 10;
   points.innerHTML = score;
-  
+
   if (score >= possibleLevels[currentLevel].nextLevelScore) {
     currentLevel++;
     levels.innerHTML = currentLevel;
   }
 }
 
-
-
-
- function getNewFigures() {
+function getNewFigures() {
   const possibleFigures = 'IJLOTSZ';
   const rand = Math.floor(Math.random() * 7);
   const newPiece = figures[possibleFigures[rand]];
@@ -233,36 +236,105 @@ function moveDown() {
     activePiece.y -= 1;
     fixFigure();
     eraseLines();
-    //updateScore(filledLines);
     activePiece = getNewFigures();
-    activePiece.y = 0;
+    if (hasCollisions()) {
+      reset();
+    }
   }
+}
+
+function reset(manualReset = false) {
+  field = createField();
+  getState();
+  if (manualReset) {
+    activePiece = getNewFigures();
+    gameTime();
+    updateState();
+  } else {
+    gameTime();
+  }
+  text('block');
+  yourScore.style.display = 'block';
+  yourScore.innerHTML = score;
+  updateScore();
+}
+
+function updateState() {
+  addActivePiece();
+  draw();
+}
+
+function text(condition) {
+  gameOver.style.display = condition;
+  textScore.style.display = condition;
+  startAgain.style.display = condition;
+}
+
+function updateScore() {
+  score = 0;
+  currentLevel = 1;
+  levels.innerHTML = currentLevel;
+  points.innerHTML = score;
+}
+
+function gameTime() {
+  clearInterval(timerID);
+  timerID = undefined;
+  isPaused = true;
 }
 
 document.addEventListener(
   'keydown',
-  e => {
-    switch (e.code) {
-    case 'ArrowLeft':
-      activePiece.x -= 1;
-      if (hasCollisions()) {
-        activePiece.x += 1;
+  (e) => {
+    if (!isPaused) {
+      switch (e.code) {
+        case 'ArrowLeft':
+          activePiece.x -= 1;
+          if (hasCollisions()) {
+            activePiece.x += 1;
+          }
+          break;
+        case 'ArrowRight':
+          activePiece.x += 1;
+          if (hasCollisions()) {
+            activePiece.x -= 1;
+          }
+          break;
+        case 'ArrowDown':
+          moveDown();
+          break;
+        case 'ArrowUp':
+          spinPiece();
       }
-      break;
-    case 'ArrowRight':
-      activePiece.x += 1;
-      if (hasCollisions()) {
-        activePiece.x -= 1;
-      }
-      break;
-    case 'ArrowDown':
-      moveDown();
-      break;
-    case 'ArrowUp':
-      spinPiece();
+      updateState();
     }
-    addActivePiece();
-    draw();
+  },
+  true
+);
+
+document.addEventListener(
+  'keydown',
+  (e) => {
+    switch (e.code) {
+      case 'Space':
+        clearInterval(timerID);
+        pause.style.display = 'block';
+        if (isPaused) {
+          timerID = setInterval(startGame, possibleLevels[currentLevel].speed);
+          pause.style.display = 'none';
+        }
+        isPaused = !isPaused;
+        break;
+      case 'Enter':
+        if (!timerID) {
+          isPaused = false;
+          timerID = setInterval(startGame, possibleLevels[currentLevel].speed);
+          text('none');
+          start.style.display = 'none';
+        } else {
+          reset(true);
+        }
+    }
   },
   true
 );
@@ -270,12 +342,9 @@ document.addEventListener(
 points.innerHTML = score;
 levels.innerHTML = currentLevel;
 
-function startGame() {
-  getState();
-  moveDown();
-  addActivePiece();
-  draw();
-  setTimeout(startGame, possibleLevels[currentLevel].speed);
-}
+draw();
 
-setTimeout(startGame, possibleLevels[currentLevel].speed);
+function startGame() {
+  moveDown();
+  updateState();
+}
