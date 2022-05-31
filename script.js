@@ -160,6 +160,16 @@ function spinPiece() {
   }
 }
 
+function dropPiece() {
+  for (let y = activePiece.y; y < field.length; y++) {
+    activePiece.y += 1;
+    if (hasCollisions()){
+      activePiece.y -= 1;
+      break;
+    }
+  }
+}
+
 function hasCollisions() {
   for (let y = 0; y < activePiece.blocks.length; y++) {
     for (let x = 0; x < activePiece.blocks[y].length; x++) {
@@ -305,6 +315,10 @@ document.addEventListener(
           break;
         case 'ArrowUp':
           spinPiece();
+          break;
+        case 'ShiftRight':
+          dropPiece();
+          break;
       }
       updateState();
     }
@@ -334,7 +348,7 @@ document.addEventListener(
         } else {
           reset(true);
         }
-    }
+     }
   },
   true
 );
