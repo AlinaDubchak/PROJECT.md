@@ -9,6 +9,7 @@ const textScore = document.getElementById('your-score');
 const start = document.getElementById('start');
 const startAgain = document.getElementById('start-again');
 const pause = document.getElementById('space');
+const nextFigure = document.getElementById('next-piece');
 
 const movingCells = 1,
   fixedCells = 2,
@@ -84,6 +85,7 @@ const figures = {
 
 let field = createField(); //1
 let activePiece = getNewFigures();
+let nextPiece = getNewFigures();
 
 function createField() {
   const field = [];
@@ -127,6 +129,22 @@ function draw() {
   }
 
   main.innerHTML = fieldHTML;
+}
+
+function drawNextPiece() {
+  let nextFigureInnerHTML = '';
+  for (let y = 0; y < nextPiece.blocks.length; y++) {
+    for (let x = 0; x < nextPiece.blocks[y].length; x++) {
+      if (nextPiece.blocks[y][x]) {
+        nextFigureInnerHTML += '<div class="cell movingCell"></div>';
+      }
+      else {
+        nextFigureInnerHTML += '<div class="cell"></div>';
+      }
+    }
+    nextFigureInnerHTML += '<br/>';
+    }
+  nextFigure.innerHTML = nextFigureInnerHTML; 
 }
 
 function removePrevPiece() {
@@ -246,7 +264,8 @@ function moveDown() {
     activePiece.y -= 1;
     fixFigure();
     eraseLines();
-    activePiece = getNewFigures();
+    activePiece = nextPiece;
+    nextPiece = getNewFigures();
     if (hasCollisions()) {
       reset();
     }
@@ -271,6 +290,7 @@ function reset(manualReset = false) {
 
 function updateState() {
   addActivePiece();
+  drawNextPiece();
   draw();
 }
 
@@ -358,7 +378,10 @@ levels.innerHTML = currentLevel;
 
 draw();
 
+
+
 function startGame() {
+  drawNextPiece();
   moveDown();
   updateState();
 }
