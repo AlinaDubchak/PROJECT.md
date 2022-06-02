@@ -1,25 +1,39 @@
 'use strict';
 
-const main = document.querySelector('.main');
-const points = document.getElementById('score');
-const levels = document.getElementById('level');
-const gameOver = document.getElementById('game-over');
-const yourScore = document.getElementById('current-score');
-const textScore = document.getElementById('your-score');
-const start = document.getElementById('start');
-const startAgain = document.getElementById('start-again');
-const pause = document.getElementById('space');
-const nextFigure = document.getElementById('next-piece');
+class View {
+  constructor() {
+    this.main = document.querySelector('.main');
+    this.points = document.getElementById('score');
+    this.levels = document.getElementById('level');
+    this.gameOver = document.getElementById('game-over');
+    this.yourScore = document.getElementById('current-score');
+    this.textScore = document.getElementById('your-score');
+    this.start = document.getElementById('start');
+    this.startAgain = document.getElementById('start-again');
+    this.pause = document.getElementById('space');
+    this.nextFigure = document.getElementById('next-piece');
+  }
+}
 
-const movingCells = 1,
-  fixedCells = 2,
-  freeCells = 0,
-  rows = 20,
-  colums = 10;
-let score = 0;
-let isPaused = true;
-let currentLevel = 1;
-let timerID;
+const gameTimers = {
+  isPaused: true,
+  timerID: undefined,
+};
+
+class Options {
+  constructor() {
+    this.movingCells = 1;
+    this.fixedCells = 2;
+    this.freeCells = 0;
+    this.rows = 20;
+    this.colums = 10;
+    this.score = 0;
+    this.currentLevel = 1;
+  }
+}
+
+const gameOptions = new Options();
+const visual = new View();
 
 const possibleLevels = {
   1: {
@@ -83,15 +97,15 @@ const figures = {
   ],
 };
 
-let field = createField(); //1
+let field = createField();
 let activePiece = getNewFigures();
 let nextPiece = getNewFigures();
 
 function createField() {
   const field = [];
-  for (let y = 0; y < rows; y++) {
+  for (let y = 0; y < gameOptions.rows; y++) {
     field[y] = [];
-    for (let x = 0; x < colums; x++) {
+    for (let x = 0; x < gameOptions.colums; x++) {
       field[y][x] = 0;
     }
   }
@@ -99,7 +113,7 @@ function createField() {
 }
 
 function getState() {
-  const field = createField(); //1
+  const field = createField();
   for (let y = 0; y < field.length; y++) {
     field[y] = [];
     for (let x = 0; x < field[y].length; x++) {
@@ -120,15 +134,15 @@ function draw() {
   let fieldHTML = '';
   for (let y = 0; y < field.length; y++) {
     for (let x = 0; x < field[y].length; x++) {
-      if (field[y][x] === movingCells) {
+      if (field[y][x] === gameOptions.movingCells) {
         fieldHTML += '<div class="cell movingCell"></div>';
-      } else if (field[y][x] === fixedCells) {
+      } else if (field[y][x] === gameOptions.fixedCells) {
         fieldHTML += '<div class="cell fixedCell"></div>';
       } else fieldHTML += '<div class="cell"></div>';
     }
   }
 
-  main.innerHTML = fieldHTML;
+  visual.main.innerHTML = fieldHTML;
 }
 
 function drawNextPiece() {
@@ -137,21 +151,20 @@ function drawNextPiece() {
     for (let x = 0; x < nextPiece.blocks[y].length; x++) {
       if (nextPiece.blocks[y][x]) {
         nextFigureInnerHTML += '<div class="cell movingCell"></div>';
-      }
-      else {
+      } else {
         nextFigureInnerHTML += '<div class="cell"></div>';
       }
     }
     nextFigureInnerHTML += '<br/>';
-    }
-  nextFigure.innerHTML = nextFigureInnerHTML; 
+  }
+  visual.nextFigure.innerHTML = nextFigureInnerHTML;
 }
 
 function removePrevPiece() {
   for (let y = 0; y < field.length; y++) {
     for (let x = 0; x < field[y].length; x++) {
-      if (field[y][x] === movingCells) {
-        field[y][x] = freeCells;
+      if (field[y][x] === gameOptions.movingCells) {
+        field[y][x] = gameOptions.freeCells;
       }
     }
   }
@@ -161,7 +174,7 @@ function addActivePiece() {
   removePrevPiece();
   for (let y = 0; y < activePiece.blocks.length; y++) {
     for (let x = 0; x < activePiece.blocks[y].length; x++) {
-      if (activePiece.blocks[y][x] === movingCells) {
+      if (activePiece.blocks[y][x] === gameOptions.movingCells) {
         field[activePiece.y + y][activePiece.x + x] = activePiece.blocks[y][x];
       }
     }
@@ -181,7 +194,7 @@ function spinPiece() {
 function dropPiece() {
   for (let y = activePiece.y; y < field.length; y++) {
     activePiece.y += 1;
-    if (hasCollisions()){
+    if (hasCollisions()) {
       activePiece.y -= 1;
       break;
     }
@@ -195,7 +208,8 @@ function hasCollisions() {
         activePiece.blocks[y][x] &&
         (field[activePiece.y + y] === undefined ||
           field[activePiece.y + y][activePiece.x + x] === undefined ||
-          field[activePiece.y + y][activePiece.x + x] === fixedCells)
+          field[activePiece.y + y][activePiece.x + x] ===
+            gameOptions.fixedCells)
       ) {
         return true;
       }
@@ -207,33 +221,35 @@ function hasCollisions() {
 function eraseLines() {
   const lines = [];
   let filledLines = 0;
-  for (let y = rows - 1; y >= 0; y--) {
+  for (let y = gameOptions.rows - 1; y >= 0; y--) {
     let numberOfBlocks = 0;
-    for (let x = 0; x < colums; x++) {
+    for (let x = 0; x < gameOptions.colums; x++) {
       if (field[y][x]) {
         numberOfBlocks += 1;
       }
     }
     if (numberOfBlocks === 0) {
       break;
-    } else if (numberOfBlocks < colums) {
+    } else if (numberOfBlocks < gameOptions.colums) {
       continue;
-    } else if (numberOfBlocks === colums) {
+    } else if (numberOfBlocks === gameOptions.colums) {
       lines.unshift(y);
     }
   }
   for (const index of lines) {
     field.splice(index, 1);
-    field.unshift(new Array(colums).fill(0));
+    field.unshift(new Array(gameOptions.colums).fill(0));
     filledLines += 1;
   }
 
-  score += filledLines * filledLines * 10;
-  points.innerHTML = score;
+  gameOptions.score += filledLines * filledLines * 10;
+  visual.points.innerHTML = gameOptions.score;
 
-  if (score >= possibleLevels[currentLevel].nextLevelScore) {
-    currentLevel++;
-    levels.innerHTML = currentLevel;
+  if (
+    gameOptions.score >= possibleLevels[gameOptions.currentLevel].nextLevelScore
+  ) {
+    gameOptions.currentLevel++;
+    visual.levels.innerHTML = gameOptions.currentLevel;
   }
 }
 
@@ -251,8 +267,8 @@ function getNewFigures() {
 function fixFigure() {
   for (let y = field.length - 1; y >= 0; y--) {
     for (let x = 0; x < field[y].length; x++) {
-      if (field[y][x] === movingCells) {
-        field[y][x] = fixedCells;
+      if (field[y][x] === gameOptions.movingCells) {
+        field[y][x] = gameOptions.fixedCells;
       }
     }
   }
@@ -278,13 +294,14 @@ function reset(manualReset = false) {
   if (manualReset) {
     activePiece = getNewFigures();
     gameTime();
-    updateState();
+    draw();
   } else {
     gameTime();
   }
   text('block');
-  yourScore.style.display = 'block';
-  yourScore.innerHTML = score;
+  visual.yourScore.style.display = 'block';
+  visual.yourScore.innerHTML = gameOptions.score;
+
   updateScore();
 }
 
@@ -295,28 +312,28 @@ function updateState() {
 }
 
 function text(condition) {
-  gameOver.style.display = condition;
-  textScore.style.display = condition;
-  startAgain.style.display = condition;
+  visual.gameOver.style.display = condition;
+  visual.textScore.style.display = condition;
+  visual.startAgain.style.display = condition;
 }
 
 function updateScore() {
-  score = 0;
-  currentLevel = 1;
-  levels.innerHTML = currentLevel;
-  points.innerHTML = score;
+  gameOptions.score = 0;
+  gameOptions.currentLevel = 1;
+  visual.levels.innerHTML = gameOptions.currentLevel;
+  visual.points.innerHTML = gameOptions.score;
 }
 
 function gameTime() {
-  clearInterval(timerID);
-  timerID = undefined;
-  isPaused = true;
+  clearInterval(gameTimers.timerID);
+  gameTimers.timerID = undefined;
+  gameTimers.isPaused = true;
 }
 
 document.addEventListener(
   'keydown',
   (e) => {
-    if (!isPaused) {
+    if (!gameTimers.isPaused) {
       switch (e.code) {
         case 'ArrowLeft':
           activePiece.x -= 1;
@@ -351,34 +368,38 @@ document.addEventListener(
   (e) => {
     switch (e.code) {
       case 'Space':
-        clearInterval(timerID);
-        pause.style.display = 'block';
-        if (isPaused) {
-          timerID = setInterval(startGame, possibleLevels[currentLevel].speed);
-          pause.style.display = 'none';
+        clearInterval(gameTimers.timerID);
+        visual.pause.style.display = 'block';
+        if (gameTimers.isPaused) {
+          gameTimers.timerID = setInterval(
+            startGame,
+            possibleLevels[gameOptions.currentLevel].speed
+          );
+          visual.pause.style.display = 'none';
         }
-        isPaused = !isPaused;
+        gameTimers.isPaused = !gameTimers.isPaused;
         break;
       case 'Enter':
-        if (!timerID) {
-          isPaused = false;
-          timerID = setInterval(startGame, possibleLevels[currentLevel].speed);
+        if (!gameTimers.timerID) {
+          gameTimers.isPaused = false;
+          gameTimers.timerID = setInterval(
+            startGame,
+            possibleLevels[gameOptions.currentLevel].speed
+          );
           text('none');
-          start.style.display = 'none';
+          visual.start.style.display = 'none';
         } else {
           reset(true);
         }
-     }
+    }
   },
   true
 );
 
-points.innerHTML = score;
-levels.innerHTML = currentLevel;
+visual.points.innerHTML = gameOptions.score;
+visual.levels.innerHTML = gameOptions.currentLevel;
 
 draw();
-
-
 
 function startGame() {
   drawNextPiece();
