@@ -9,7 +9,7 @@ const sound = function(source) {
 
 const playMusic = audio => audio.play();
 const stopMusic = audio => audio.pause();
-const beginAudio = audio => audio.currentTime = 0;
+const beginMusic = audio => audio.currentTime = 0;
 
 const mainSound = sound('./sound/mainSound.mp3');
 mainSound.loop;

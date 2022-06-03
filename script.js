@@ -258,6 +258,9 @@ function eraseLines() {
   if (
     gameOptions.score >= possibleLevels[5].nextLevelScore
   ) {
+    stopMusic(mainSound);
+    playMusic(victorySound);
+    beginMusic(mainSound);
     visual.win.style.display = 'block';
     visual.startAgainBtn.style.display = 'block';
     clear();
@@ -312,7 +315,7 @@ function reset(manualReset = false) {
   getState();
   stopMusic(mainSound);
   playMusic(defeatSound);
-  beginAudio(mainSound);
+  beginMusic(mainSound);
   if (manualReset) {
     activePiece = getNewFigures();
     gameTime();
