@@ -240,12 +240,13 @@ function eraseLines() {
     field.splice(index, 1);
     field.unshift(new Array(gameOptions.colums).fill(0));
     filledLines += 1;
+    playMusic(scoreSound());
   }
 
   gameOptions.score += filledLines * filledLines * 10;
   visual.points.innerHTML = gameOptions.score;
 
-  if (
+    if (
     gameOptions.score >= possibleLevels[gameOptions.currentLevel].nextLevelScore
   ) {
     gameOptions.currentLevel++;
@@ -291,6 +292,9 @@ function moveDown() {
 function reset(manualReset = false) {
   field = createField();
   getState();
+  stopMusic(mainSound);
+  playMusic(defeatSound);
+  beginAudio(mainSound);
   if (manualReset) {
     activePiece = getNewFigures();
     gameTime();
@@ -402,6 +406,7 @@ visual.levels.innerHTML = gameOptions.currentLevel;
 draw();
 
 function startGame() {
+  playMusic(mainSound);
   drawNextPiece();
   moveDown();
   updateState();
