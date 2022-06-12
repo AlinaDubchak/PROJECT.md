@@ -17,5 +17,7 @@ collection.set('ArrowRight', function() {
 collection.set('ArrowDown', moveDown);
 collection.set('ArrowUp', spinPiece);
 collection.set('ShiftRight', dropPiece);
-collection.set('Enter', enterKey);
-collection.set('Space', pauseKey);
+
+const collection2 = new Map ();
+collection2.set('Enter', enterKey);
+collection2.set('Space', pauseKey);

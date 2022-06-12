@@ -260,15 +260,19 @@ function controllers() {
     if (!gameTimers.isPaused) {
       collection.get(e.code)();
       updateState();
-    } else {
-      collection.get(e.code)();
-      updateState();
     }
   }
   );
 }
+function gameStatus() {
+  document.addEventListener('keydown', e => {
+    collection2.get(e.code)();
+    updateState();
+  });
+}
 
 controllers();
+gameStatus();
 
 function pauseKey() {
   clearInterval(gameTimers.timerID);
