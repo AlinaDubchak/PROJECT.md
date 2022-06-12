@@ -169,7 +169,6 @@ function eraseLines() {
 
 function clear() {
   clearInterval(gameTimers.timerID);
-  gameTimers.isPaused = true;
   field = createField();
   getState();
   updateState();
@@ -271,7 +270,6 @@ function controllers() {
 
 controllers();
 
-
 function pauseKey() {
   clearInterval(gameTimers.timerID);
   visual.pause.style.display = 'block';
@@ -299,7 +297,6 @@ function enterKey() {
     reset(true);
   }
 }
-
 
 visual.startAgainBtn.addEventListener('click', e => {
   visual.startAgainBtn.style.display = 'none';

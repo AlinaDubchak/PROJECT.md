@@ -30,7 +30,7 @@ class View {
       this.freeCells = 0;
       this.rows = 20;
       this.colums = 10;
-      this.score = 990;
+      this.score = 0;
       this.currentLevel = 1;
     }
   }
