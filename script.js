@@ -324,6 +324,7 @@ function reset(manualReset = false) {
     gameTime();
   }
   text('block');
+  visual.pause.style.display = 'none';
   visual.yourScore.style.display = 'block';
   visual.yourScore.innerHTML = gameOptions.score;
 
@@ -355,72 +356,50 @@ function gameTime() {
   gameTimers.isPaused = true;
 }
 
-document.addEventListener(
-  'keydown',
-  e => {
+function controllers() {
+  document.addEventListener('keydown', e => {
     if (!gameTimers.isPaused) {
-      switch (e.code) {
-      case 'ArrowLeft':
-        activePiece.x -= 1;
-        if (hasCollisions()) {
-          activePiece.x += 1;
-        }
-        break;
-      case 'ArrowRight':
-        activePiece.x += 1;
-        if (hasCollisions()) {
-          activePiece.x -= 1;
-        }
-        break;
-      case 'ArrowDown':
-        moveDown();
-        break;
-      case 'ArrowUp':
-        spinPiece();
-        break;
-      case 'ShiftRight':
-        dropPiece();
-        break;
-      }
+      collection.get(e.code)();
+      updateState();
+    } else {
+      collection.get(e.code)();
       updateState();
     }
-  },
-  true
-);
+  }
+  );
+}
 
-document.addEventListener(
-  'keydown',
-  e => {
-    switch (e.code) {
-    case 'Space':
-      clearInterval(gameTimers.timerID);
-      visual.pause.style.display = 'block';
-      if (gameTimers.isPaused) {
-        gameTimers.timerID = setInterval(
-          startGame,
-          possibleLevels[gameOptions.currentLevel].speed
-        );
-        visual.pause.style.display = 'none';
-      }
-      gameTimers.isPaused = !gameTimers.isPaused;
-      break;
-    case 'Enter':
-      if (!gameTimers.timerID) {
-        gameTimers.isPaused = false;
-        gameTimers.timerID = setInterval(
-          startGame,
-          possibleLevels[gameOptions.currentLevel].speed
-        );
-        text('none');
-        visual.start.style.display = 'none';
-        visual.prevNextFigure.style.display = 'block';
-      } else {
-        reset(true);
-      }
-    }
-  },
-  true
-);
+controllers();
+
+
+function pauseKey() {
+  clearInterval(gameTimers.timerID);
+  visual.pause.style.display = 'block';
+  if (gameTimers.isPaused) {
+    gameTimers.timerID = setInterval(
+      startGame,
+      possibleLevels[gameOptions.currentLevel].speed
+    );
+    visual.pause.style.display = 'none';
+  }
+  gameTimers.isPaused = !gameTimers.isPaused;
+}
+
+function enterKey() {
+  if (!gameTimers.timerID) {
+    gameTimers.isPaused = false;
+    gameTimers.timerID = setInterval(
+      startGame,
+      possibleLevels[gameOptions.currentLevel].speed
+    );
+    text('none');
+    visual.start.style.display = 'none';
+    visual.prevNextFigure.style.display = 'block';
+  } else {
+    reset(true);
+  }
+}
+
 
 visual.startAgainBtn.addEventListener('click', e => {
   visual.startAgainBtn.style.display = 'none';
