@@ -145,10 +145,11 @@ function eraseLines() {
     filledLines += 1;
     playMusic(scoreSound());
   }
-
   options.score += filledLines * filledLines * 10;
   view.points.innerHTML = options.score;
+}
 
+function countScore() {
   if (
     options.score >= possibleLevels[options.currentLevel].nextLevelScore
   ) {
@@ -166,6 +167,7 @@ function eraseLines() {
     clear();
   }
 }
+countScore();
 
 function clear() {
   clearInterval(gameTimers.timerID);
