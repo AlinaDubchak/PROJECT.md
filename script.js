@@ -149,7 +149,7 @@ function eraseLines() {
   view.points.innerHTML = options.score;
 }
 
-function countScore() {
+function countLevel() {
   if (
     options.score >= possibleLevels[options.currentLevel].nextLevelScore
   ) {
@@ -167,7 +167,7 @@ function countScore() {
     clear();
   }
 }
-countScore();
+countLevel();
 
 function clear() {
   clearInterval(gameTimers.timerID);
