@@ -167,7 +167,6 @@ function countLevel() {
     clear();
   }
 }
-countLevel();
 
 function clear() {
   clearInterval(gameTimers.timerID);
@@ -203,6 +202,7 @@ function moveDown() {
     activePiece.y -= 1;
     fixFigure();
     eraseLines();
+    countLevel();
     activePiece = nextPiece;
     nextPiece = getNewFigures();
     if (hasCollisions()) {
