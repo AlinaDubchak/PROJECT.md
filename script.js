@@ -6,9 +6,9 @@ let nextPiece = getNewFigures();
 
 function createField() {
   const field = [];
-  for (let y = 0; y < gameOptions.rows; y++) {
+  for (let y = 0; y < options.rows; y++) {
     field[y] = [];
-    for (let x = 0; x < gameOptions.colums; x++) {
+    for (let x = 0; x < options.colums; x++) {
       field[y][x] = 0;
     }
   }
@@ -37,15 +37,15 @@ function draw() {
   let fieldHTML = '';
   for (let y = 0; y < field.length; y++) {
     for (let x = 0; x < field[y].length; x++) {
-      if (field[y][x] === gameOptions.movingCells) {
+      if (field[y][x] === options.movingCells) {
         fieldHTML += '<div class="cell movingCell"></div>';
-      } else if (field[y][x] === gameOptions.fixedCells) {
+      } else if (field[y][x] === options.fixedCells) {
         fieldHTML += '<div class="cell fixedCell"></div>';
       } else fieldHTML += '<div class="cell"></div>';
     }
   }
 
-  visual.main.innerHTML = fieldHTML;
+  view.main.innerHTML = fieldHTML;
 }
 
 function drawNextPiece() {
@@ -60,14 +60,14 @@ function drawNextPiece() {
     }
     nextFigureInnerHTML += '<br/>';
   }
-  visual.nextFigure.innerHTML = nextFigureInnerHTML;
+  view.nextFigure.innerHTML = nextFigureInnerHTML;
 }
 
 function removePrevPiece() {
   for (let y = 0; y < field.length; y++) {
     for (let x = 0; x < field[y].length; x++) {
-      if (field[y][x] === gameOptions.movingCells) {
-        field[y][x] = gameOptions.freeCells;
+      if (field[y][x] === options.movingCells) {
+        field[y][x] = options.freeCells;
       }
     }
   }
@@ -77,7 +77,7 @@ function addActivePiece() {
   removePrevPiece();
   for (let y = 0; y < activePiece.blocks.length; y++) {
     for (let x = 0; x < activePiece.blocks[y].length; x++) {
-      if (activePiece.blocks[y][x] === gameOptions.movingCells) {
+      if (activePiece.blocks[y][x] === options.movingCells) {
         field[activePiece.y + y][activePiece.x + x] = activePiece.blocks[y][x];
       }
     }
@@ -112,7 +112,7 @@ function hasCollisions() {
         (field[activePiece.y + y] === undefined ||
           field[activePiece.y + y][activePiece.x + x] === undefined ||
           field[activePiece.y + y][activePiece.x + x] ===
-            gameOptions.fixedCells)
+            options.fixedCells)
       ) {
         return true;
       }
@@ -124,45 +124,45 @@ function hasCollisions() {
 function eraseLines() {
   const lines = [];
   let filledLines = 0;
-  for (let y = gameOptions.rows - 1; y >= 0; y--) {
+  for (let y = options.rows - 1; y >= 0; y--) {
     let numberOfBlocks = 0;
-    for (let x = 0; x < gameOptions.colums; x++) {
+    for (let x = 0; x < options.colums; x++) {
       if (field[y][x]) {
         numberOfBlocks += 1;
       }
     }
     if (numberOfBlocks === 0) {
       break;
-    } else if (numberOfBlocks < gameOptions.colums) {
+    } else if (numberOfBlocks < options.colums) {
       continue;
-    } else if (numberOfBlocks === gameOptions.colums) {
+    } else if (numberOfBlocks === options.colums) {
       lines.unshift(y);
     }
   }
   for (const index of lines) {
     field.splice(index, 1);
-    field.unshift(new Array(gameOptions.colums).fill(0));
+    field.unshift(new Array(options.colums).fill(0));
     filledLines += 1;
     playMusic(scoreSound());
   }
 
-  gameOptions.score += filledLines * filledLines * 10;
-  visual.points.innerHTML = gameOptions.score;
+  options.score += filledLines * filledLines * 10;
+  view.points.innerHTML = options.score;
 
   if (
-    gameOptions.score >= possibleLevels[gameOptions.currentLevel].nextLevelScore
+    options.score >= possibleLevels[options.currentLevel].nextLevelScore
   ) {
-    gameOptions.currentLevel++;
-    visual.levels.innerHTML = gameOptions.currentLevel;
+    options.currentLevel++;
+    view.levels.innerHTML = options.currentLevel;
   }
   if (
-    gameOptions.score >= possibleLevels[5].nextLevelScore
+    options.score >= possibleLevels[5].nextLevelScore
   ) {
     stopMusic(mainSound);
     playMusic(victorySound);
     beginMusic(mainSound);
-    visual.win.style.display = 'block';
-    visual.startAgainBtn.style.display = 'block';
+    view.win.style.display = 'block';
+    view.startAgainBtn.style.display = 'block';
     clear();
   }
 }
@@ -188,8 +188,8 @@ function getNewFigures() {
 function fixFigure() {
   for (let y = field.length - 1; y >= 0; y--) {
     for (let x = 0; x < field[y].length; x++) {
-      if (field[y][x] === gameOptions.movingCells) {
-        field[y][x] = gameOptions.fixedCells;
+      if (field[y][x] === options.movingCells) {
+        field[y][x] = options.fixedCells;
       }
     }
   }
@@ -223,9 +223,9 @@ function reset(manualReset = false) {
     gameTime();
   }
   text('block');
-  visual.pause.style.display = 'none';
-  visual.yourScore.style.display = 'block';
-  visual.yourScore.innerHTML = gameOptions.score;
+  view.pause.style.display = 'none';
+  view.yourScore.style.display = 'block';
+  view.yourScore.innerHTML = options.score;
 
   updateScore();
 }
@@ -237,16 +237,16 @@ function updateState() {
 }
 
 function text(condition) {
-  visual.gameOver.style.display = condition;
-  visual.textScore.style.display = condition;
-  visual.startAgain.style.display = condition;
+  view.gameOver.style.display = condition;
+  view.textScore.style.display = condition;
+  view.startAgain.style.display = condition;
 }
 
 function updateScore() {
-  gameOptions.score = 0;
-  gameOptions.currentLevel = 1;
-  visual.levels.innerHTML = gameOptions.currentLevel;
-  visual.points.innerHTML = gameOptions.score;
+  options.score = 0;
+  options.currentLevel = 1;
+  view.levels.innerHTML = options.currentLevel;
+  view.points.innerHTML = options.score;
 }
 
 function gameTime() {
@@ -276,13 +276,13 @@ gameStatus();
 
 function pauseKey() {
   clearInterval(gameTimers.timerID);
-  visual.pause.style.display = 'block';
+  view.pause.style.display = 'block';
   if (gameTimers.isPaused) {
     gameTimers.timerID = setInterval(
       startGame,
-      possibleLevels[gameOptions.currentLevel].speed
+      possibleLevels[options.currentLevel].speed
     );
-    visual.pause.style.display = 'none';
+    view.pause.style.display = 'none';
   }
   gameTimers.isPaused = !gameTimers.isPaused;
 }
@@ -292,23 +292,23 @@ function enterKey() {
     gameTimers.isPaused = false;
     gameTimers.timerID = setInterval(
       startGame,
-      possibleLevels[gameOptions.currentLevel].speed
+      possibleLevels[options.currentLevel].speed
     );
     text('none');
-    visual.start.style.display = 'none';
-    visual.prevNextFigure.style.display = 'block';
+    view.start.style.display = 'none';
+    view.prevNextFigure.style.display = 'block';
   } else {
     reset(true);
   }
 }
 
-visual.startAgainBtn.addEventListener('click', e => {
-  visual.startAgainBtn.style.display = 'none';
+view.startAgainBtn.addEventListener('click', e => {
+  view.startAgainBtn.style.display = 'none';
   location.reload();
 }, true);
 
-visual.points.innerHTML = gameOptions.score;
-visual.levels.innerHTML = gameOptions.currentLevel;
+view.points.innerHTML = options.score;
+view.levels.innerHTML = options.currentLevel;
 
 draw();
 

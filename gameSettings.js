@@ -1,42 +1,35 @@
 'use strict';
 
-class View {
-    constructor() {
-      this.main = document.querySelector('.main');
-      this.points = document.getElementById('score');
-      this.levels = document.getElementById('level');
-      this.gameOver = document.getElementById('game-over');
-      this.yourScore = document.getElementById('current-score');
-      this.textScore = document.getElementById('your-score');
-      this.start = document.getElementById('start');
-      this.startAgain = document.getElementById('start-again');
-      this.pause = document.getElementById('space');
-      this.nextFigure = document.getElementById('next-piece');
-      this.win = document.getElementById('win');
-      this.startAgainBtn = document.getElementById('startAgain');
-      this.prevNextFigure = document.getElementById('next-figure');
-    }
-  }
+const view = {
+  main: document.querySelector('.main'),
+  points: document.getElementById('score'),
+  levels: document.getElementById('level'),
+  gameOver: document.getElementById('game-over'),
+  yourScore: document.getElementById('current-score'),
+  textScore: document.getElementById('your-score'),
+  start: document.getElementById('start'),
+  startAgain: document.getElementById('start-again'),
+  pause: document.getElementById('space'),
+  nextFigure: document.getElementById('next-piece'),
+  win: document.getElementById('win'),
+  startAgainBtn: document.getElementById('startAgain'),
+  prevNextFigure: document.getElementById('next-figure'),
+  };
   
   const gameTimers = {
     isPaused: true,
     timerID: undefined,
   };
   
-  class Options {
-    constructor() {
-      this.movingCells = 1;
-      this.fixedCells = 2;
-      this.freeCells = 0;
-      this.rows = 20;
-      this.colums = 10;
-      this.score = 0;
-      this.currentLevel = 1;
-    }
-  }
-  
-  const gameOptions = new Options();
-  const visual = new View();
+  const options = {
+    movingCells: 1,
+    fixedCells: 2,
+    freeCells: 0,
+    rows: 20,
+    colums: 10,
+    score: 0,
+    currentLevel: 1,
+  };
   
   const possibleLevels = {
     1: {
