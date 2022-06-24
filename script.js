@@ -145,7 +145,7 @@ function eraseLines() {
     filledLines += 1;
     playMusic(scoreSound());
   }
-  options.score += filledLines * filledLines * 10;
+  options.score += filledLines * filledLines * options.points;
   view.points.innerHTML = options.score;
 }
 
@@ -177,7 +177,7 @@ function clear() {
 
 function getNewFigures() {
   const possibleFigures = 'IJLOTSZ';
-  const rand = Math.floor(Math.random() * 7);
+  const rand = Math.floor(Math.random() * options.numberOfFigures);
   const newPiece = figures[possibleFigures[rand]];
   return {
     x: Math.floor((10 - newPiece[0].length) / 2),

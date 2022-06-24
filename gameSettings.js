@@ -29,6 +29,8 @@ const view = {
     colums: 10,
     score: 0,
     currentLevel: 1,
+    points:10,
+    numberOfFigures: 7,
   };
   
   const possibleLevels = {
